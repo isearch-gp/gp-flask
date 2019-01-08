@@ -1,0 +1,11 @@
+# python flask/ virtualenv ignore files
+*.py~
+*.pyc
+/__pycache__
+
+/venv/lib/
+/venv/tcl/
+/venv/Scripts/
+/venv/include/
+.gitignore~
+*.swp
