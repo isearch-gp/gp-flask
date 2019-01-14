@@ -1,1 +1,1 @@
-web: gunicorn lucky:app
+web: flask translate compile; gunicorn lucky:app
