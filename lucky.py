@@ -5,6 +5,8 @@ import requests, sys, webbrowser
 from bs4 import BeautifulSoup
 from flask import Flask
 from flask import jsonify
+from flask import request
+
 app = Flask(__name__)
 
 headers_Get = {
@@ -17,33 +19,46 @@ headers_Get = {
         'Upgrade-Insecure-Requests': '1'
     }
 
+# use SerpAPI format for easy digest
 data = {
-    "search_parameters": {}, 
+    "search_metadata": {},
+    "search_parameters": {},
     "search_information": {},
+    "ads": [],
+    "local_map": {},
+    "local_results": [],
     "related_questions": [],
+    "answer_box": {},
     "organic_results": [],
-    "related_searches": []
+    "related_searches": [],
+    "pagination": {}
     }
 
 @app.route("/", methods=['GET'])
 def hello():
    return "Hello World"
 
-@app.route("/raw/<string:q>", methods=['GET'])
-def raw(q):
+@app.route("/raw", methods=['GET'])
+def raw():
+    q = request.args.get('q') # not requests
+    
 # from
 # https://automatetheboringstuff.com/chapter11/
-    res = requests.get('http://google.com/search?q=' + q)
+    #res = requests.get('http://google.com/search?q=' + q)
+    res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
     res.raise_for_status()
     return (res.text) # show html page
     
-@app.route("/search/<string:q>", methods=['GET'])
-def search(q):
-    print("q = "+q)
+@app.route("/search", methods=['GET'])
+def search():
 # from
 # https://automatetheboringstuff.com/chapter11/
     print('Googling...') # display text while downloading the Google page
-    res = requests.get('http://google.com/search?q=' + q)
+    q = request.args.get('q') # not requests
+    print("q = "+q)
+
+    #res = requests.get('http://google.com/search?q=' + q)
+    res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
     res.raise_for_status()
 
 #   print some html reponse information
@@ -115,8 +130,6 @@ def search(q):
         html=html+str(abstractElems[x])+"<br><br>"
 
     # then gen JSON
-    data.search_parameters.q = q
-    data.search_information.total_results = total_results[0]
 
     json1 = '{ "search_parameters": { "q": "'+q
     json2 = '"}, "search_information": { "total_results": '+total_results[0]
@@ -137,13 +150,15 @@ def search(q):
 
     return (html) # show URLs 
 
-@app.route("/json/<string:q>", methods=['GET'])
-def json(q):
-    print("q = "+q)
+@app.route("/json", methods=['GET'])
+def json():
 # from
 # https://automatetheboringstuff.com/chapter11/
+    q = request.args.get('q') # not requests
+    print("q = "+q)
     print('Googling...') # display text while downloading the Google page
-    res = requests.get('http://google.com/search?q=' + q)
+    #res = requests.get('http://google.com/search?q=' + q)
+    res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
     res.raise_for_status()
 
 #   print some html reponse information
