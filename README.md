@@ -3,30 +3,30 @@ Google Proxy Flask API using Python, Response and BeautifulSoup
 
 This proxy also displays web and raw web output (for debug) 
 
-# activate Virtual ENV (venv)/workon hello
+## activate Virtual ENV (venv)/workon hello
 
 C:\Users\x\Documents\GitHub\gp-flask>.\venv\Scripts\activate
 
 C:\Users\x\Documents\GitHub\gp-flask>workon hello
 
-# deactivate
+## deactivate
 
 (venv) C:\Users\x\Documents\GitHub\gp-flask>deactivate
 
-# run the Flask app
+## run the Flask app
 
 (venv) C:\Users\x\Documents\GitHub\gp-flask>python lucky.py
 
-# endpoints to test
+## endpoints to test
 
 Show response as web page (Raw HTML)
-http://localhost:5000/raw?q=__malpractice__
+http://localhost:5000/raw?q=___malpractice___
 
 Show response as web page (from parsed response data)
-http://localhost:5000/search?q=__malpractice__
+http://localhost:5000/search?q=___malpractice___
 
 Send response as JSON (for API)
-http://localhost:5000/json?q=__malpractice__
+http://localhost:5000/json?q=___malpractice___
 
 This can also be done interactivaly with Python on the command line:
 ```
