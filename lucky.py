@@ -1,7 +1,7 @@
 # lucky.py
 
 #import json
-import requests, sys, webbrowser
+import requests, sys, getopt, webbrowser
 from bs4 import BeautifulSoup
 from flask import Flask
 from flask import jsonify
@@ -10,6 +10,51 @@ import copy
 
 app = Flask(__name__)
 
+# internal switches/from args (default values)
+verbose = 0
+help = 0
+output = ''
+
+# read commandline arguments, first
+fullCmdArguments = sys.argv
+
+# - further arguments
+argumentList = fullCmdArguments[1:]
+
+#print(argumentList)
+unixOptions = "ho:v:"  
+gnuOptions = ["help", "output=", "verbose="]  
+
+# validate args sent
+try:  
+    arguments, values = getopt.getopt(argumentList, unixOptions, gnuOptions)
+except getopt.error as err:  
+    # output error, and return with an error code
+    print (str(err))
+    sys.exit(2)
+
+# evaluate given options
+for currentArgument, currentValue in arguments:  
+    if currentArgument in ("-v", "--verbose"):
+        #print ("enabling verbose mode of (%s)", currentValue)
+        print ("verbose mode of "+str(currentValue))
+        verbose = int(currentValue)
+    elif currentArgument in ("-h", "--help"):
+        #print ("displaying help")
+        print (sys.argv[0]+" - Python Web Scaping API in Flask\n")
+        print ("\tOptions:")
+        print ("\t-h   --help       this message")
+        print ("\t-v N --verbose=N  verbose output\n")
+        print ("\t\t 0 = Info")
+        print ("\t\t 3 = JSON payload counts")
+        print ("\t\t 5 = JSON payload elements")
+        print ("\t\t 6 = raw JSON payload")
+        sys.exit(1)
+    elif currentArgument in ("-o", "--output"):
+        print ("enabling special output mode (%s)", currentValue)
+        output = currentValue
+
+# headers to use in Get
 headers_Get = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -93,21 +138,23 @@ def search():
 #        print("link = "+titleElems[x]["href"]+"\n")
         print("link = "+link+"\n")
 
-    print("\n\nlinkElems")
-    print(*linkElems, sep = "\n")
+    if (verbose > 3):
+       print("\n\nlinkElems")
+       print(*linkElems, sep = "\n")
 
-    print("\n\nabstractElems")
-    print(*abstractElems, sep = "\n")
+       print("\n\nabstractElems")
+       print(*abstractElems, sep = "\n")
 
-    print("\n\nrelatedSearches")
-    print(*relatedSearches, sep = "\n")
+       print("\n\nrelatedSearches")
+       print(*relatedSearches, sep = "\n")
 
 #    print(*resultStats, sep = "\n")
 #    total_results = int(resultStats[0])
     total_results = result_count
 
-    print("\n\ntotal_results")
-    print (total_results)
+    if (verbose > 3):
+       print("\n\ntotal_results")
+       print (total_results)
 
 #    print(*titles, sep = "\n")
 
@@ -121,19 +168,23 @@ def search():
 #        html=html+"<p>"+str(resultStats[x])+"<br>"
     for x in range(len(total_results)):
          html=html+"<p>"+total_results[x]+"<br>"
-         print ("<p>"+total_results[x]+"<br>")
+         if (verbose > 5):
+             print ("<p>"+total_results[x]+"<br>")
     html=html+"<h2>Related Searches</h2>"
     for x in range(len(relatedSearches)):
         html=html+str(relatedSearches[x])+"<br><br>"
-        print(str(relatedSearches[x])+"<br><br>")
+        if (verbose > 5):
+            print(str(relatedSearches[x])+"<br><br>")
     html=html+"<h2>Related Questions</h2>"
 
     html=html+"<h2>Organic Results</h2>"
     for x in range(len(linkElems)): 
         html=html+str(linkElems[x])+"<br>"
-        print("linkElems="+str(len(linkElems))+" x="+str(x)+"\n")
+        if (verbose > 5):
+            print("linkElems="+str(len(linkElems))+" x="+str(x)+"\n")
         # can have link without snippet?
-        print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
+        if (verbose > 5):
+            print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
         if ((len(abstractElems)) >= x-1):
             html=html+str(abstractElems[x])+"<br><br>"
 
@@ -170,10 +221,11 @@ def json():
     res.raise_for_status()
 
 #   print some html reponse information
-    print("status = "+str(res.status_code))
-    if "blocked" in res.text:
-        print( "we've been blocked")
-    print (res.headers.get("content-type", "unknown"))
+    if (verbose > 0):
+        print("status = "+str(res.status_code))
+        if "blocked" in res.text:
+            print( "we've been blocked")
+        print (res.headers.get("content-type", "unknown"))
 
 # Retrieve top search result links.
     soup = BeautifulSoup(res.text,"html.parser")
@@ -197,30 +249,34 @@ def json():
         link = titleElems[x]["href"]
         print("link = "+link+"\n")
 
-    print("\n\nlinkElems")
-    print(*linkElems, sep = "\n")
+    if (verbose > 3):
+        print("\n\nlinkElems")
+        print(*linkElems, sep = "\n")
 
-    print("\n\nabstractElems")
-    print(*abstractElems, sep = "\n")
+        print("\n\nabstractElems")
+        print(*abstractElems, sep = "\n")
 
     if (relatedSearches):
-      print("\n\nrelatedSearches")
-      print(*relatedSearches, sep = "\n")
+        if (verbose > 3):
+          print("\n\nrelatedSearches")
+          print(*relatedSearches, sep = "\n")
 
 #    print(*resultStats, sep = "\n")
 #    total_results = int(resultStats[0])
     total_results = result_count
 
-    print("\n\ntotal_results")
-    print (total_results)
+    if (verbose > 3):
+        print("\n\ntotal_results")
+        print (total_results)
 
     # then gen JSON
     #data1 = data # empty struct
     #data1 = data[:] # empty struct
     # https://stackoverflow.com/questions/5105517/deep-copy-of-a-dict-in-python
     data1 = copy.deepcopy(data) # empty struct
-    print("data1: ")
-    print(data1)
+    if (verbose > 6):
+        print("post-copy, pre-fill data1: ")
+        print(data1)
 
     data1["search_parameters"]["q"]= q
     data1["search_information"]["total_results"]= total_results[0]
@@ -232,7 +288,8 @@ def json():
         link = titleElems[x]["href"][7:] # remove /url?q=
         #print("link = "+link+"\n")
 	# can have link without snippet?
-        print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
+        if (verbose > 5):
+            print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
         if (len(abstractElems) > x):
            snippet = abstractElems[x].text
         else:
@@ -248,8 +305,9 @@ def json():
             link = relatedSearches[x]["href"]
             data1["related_searches"].append({ "query": query, "link": link })
 
-    print("data1 out:")
-    print(data1)
+    if (verbose > 6):
+        print("returned data1 out:")
+        print(data1)
     return(jsonify(data1))
 
 if __name__ == "__main__":
