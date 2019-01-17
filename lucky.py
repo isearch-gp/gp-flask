@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from flask import Flask
 from flask import jsonify
 from flask import request
+import copy
 
 app = Flask(__name__)
 
@@ -120,14 +121,21 @@ def search():
 #        html=html+"<p>"+str(resultStats[x])+"<br>"
     for x in range(len(total_results)):
          html=html+"<p>"+total_results[x]+"<br>"
+         print ("<p>"+total_results[x]+"<br>")
     html=html+"<h2>Related Searches</h2>"
     for x in range(len(relatedSearches)):
         html=html+str(relatedSearches[x])+"<br><br>"
+        print(str(relatedSearches[x])+"<br><br>")
     html=html+"<h2>Related Questions</h2>"
+
     html=html+"<h2>Organic Results</h2>"
     for x in range(len(linkElems)): 
         html=html+str(linkElems[x])+"<br>"
-        html=html+str(abstractElems[x])+"<br><br>"
+        print("linkElems="+str(len(linkElems))+" x="+str(x)+"\n")
+        # can have link without snippet?
+        print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
+        if ((len(abstractElems)) >= x-1):
+            html=html+str(abstractElems[x])+"<br><br>"
 
     # then gen JSON
 
@@ -195,8 +203,9 @@ def json():
     print("\n\nabstractElems")
     print(*abstractElems, sep = "\n")
 
-    print("\n\nrelatedSearches")
-    print(*relatedSearches, sep = "\n")
+    if (relatedSearches):
+      print("\n\nrelatedSearches")
+      print(*relatedSearches, sep = "\n")
 
 #    print(*resultStats, sep = "\n")
 #    total_results = int(resultStats[0])
@@ -206,7 +215,13 @@ def json():
     print (total_results)
 
     # then gen JSON
-    data1 = data # empty struct
+    #data1 = data # empty struct
+    #data1 = data[:] # empty struct
+    # https://stackoverflow.com/questions/5105517/deep-copy-of-a-dict-in-python
+    data1 = copy.deepcopy(data) # empty struct
+    print("data1: ")
+    print(data1)
+
     data1["search_parameters"]["q"]= q
     data1["search_information"]["total_results"]= total_results[0]
     # "organic_results": []
@@ -216,17 +231,25 @@ def json():
         #print("title = "+title+"\n")
         link = titleElems[x]["href"][7:] # remove /url?q=
         #print("link = "+link+"\n")
-        snippet = abstractElems[x].text
+	# can have link without snippet?
+        print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
+        if (len(abstractElems) > x):
+           snippet = abstractElems[x].text
+        else:
+           snippet = ''
         data1["organic_results"].append({ "position": position, "title" : title, "link": link, "snippet": snippet })
 
     # "related_questions": []
 
     # "related_searches": [ ]
-    for x in range(len(relatedSearches)):
-        query = relatedSearches[x].text
-        link = relatedSearches[x]["href"]
-        data1["related_searches"].append({ "query": query, "link": link })
+    if (relatedSearches):
+        for x in range(len(relatedSearches)):
+            query = relatedSearches[x].text
+            link = relatedSearches[x]["href"]
+            data1["related_searches"].append({ "query": query, "link": link })
 
+    print("data1 out:")
+    print(data1)
     return(jsonify(data1))
 
 if __name__ == "__main__":
