@@ -3,7 +3,21 @@ Google Proxy Flask API using Python, Response and BeautifulSoup
 
 I originally tried to "port" Googler to an API but found it much easier to do the web scraping myself.  Still need to add a lot of functionality (see ToDo below).
 
-This proxy also displays web and raw web output (for debug) 
+This proxy also displays web and raw web output (for debug)
+
+## Usage:
+```
+lucky.py - Python Web Scaping API in Flask
+
+        Options:
+        -h   --help       this message
+        -v N --verbose=N  verbose output
+
+                 0 = Info
+                 3 = JSON payload counts
+                 5 = JSON payload elements
+                 6 = raw JSON payload
+```
 
 ## Python Dev setup
 ### activate Virtual ENV (venv)/workon hello
@@ -44,16 +58,24 @@ or with cURL:
 curl http:///127.0.0.1:5000/json?q=malpractice
 ```
 
-## Advanced Topics (todo)
+## Advanced Topics (ToDo)
 
+- CI Testing
+- API Testing
+- Handling Network Errors
+
+### Scraper stuff
 - Sessions and Cookies
 - Delays and Backing Off
 - Spoofing and Cycling the User Agent
 - Using Proxy Servers
 - Setting Timeouts
-- Handling Network Errors
 - Use Selenium web driver
 - Use PhantomJS for headless JS support
+
+### Service stuff
+- Authentication
+- Logging
 
 ## Links
 

@@ -45,7 +45,7 @@ for currentArgument, currentValue in arguments:
         print ("\tOptions:")
         print ("\t-h   --help       this message")
         print ("\t-v N --verbose=N  verbose output\n")
-        print ("\t\t 0 = Info")
+        print ("\t\t 0 = Info (default)")
         print ("\t\t 3 = JSON payload counts")
         print ("\t\t 5 = JSON payload elements")
         print ("\t\t 6 = raw JSON payload")
