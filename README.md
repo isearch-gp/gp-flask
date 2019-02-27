@@ -2,8 +2,12 @@
 
 ## Google Proxy Flask API using Python, Response and BeautifulSoup
 
+![GitHub package.json version](https://img.shields.io/github/package-json/v/mkobar/gp-flask.svg)
+![GitHub tag](https://img.shields.io/github/tag/mkobar/gp-flask.svg)
+
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/mkobar/gp-serp-url.svg?columns=all)](https://waffle.io/mkobar/gp-serp-url)
 [![Known Vulnerabilities](https://snyk.io/test/github/mkobar/gp-flask/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/mkobar/gp-flask?targetFile=requirements.txt)
+![Website](https://img.shields.io/website-up-down-green-red/https/gp-python.herokuapp.com%2Fsearch%3Fhl%3Den%26gl%3Dus%26ie%3DUTF-8%26q%3Dcats%2Bvideo.svg)
 
 I originally tried to "port" Googler to an API but found it much easier to do the web scraping myself.  Still need to add a lot of functionality (see ToDo below).
 
