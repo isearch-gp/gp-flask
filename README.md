@@ -36,11 +36,11 @@ C:\Users\x\Documents\GitHub\gp-flask>workon hello
 
 ### deactivate
 
-(venv) C:\Users\x\Documents\GitHub\gp-flask>deactivate
+(hello) C:\Users\x\Documents\GitHub\gp-flask>deactivate
 
 ### run the Flask app
 
-(venv) C:\Users\x\Documents\GitHub\gp-flask>python lucky.py
+(hello) C:\Users\x\Documents\GitHub\gp-flask>python lucky.py
 
 ## Endpoints to test
 
