@@ -56,7 +56,7 @@ for currentArgument, currentValue in arguments:
 
 # headers to use in Get
 headers_Get = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/62.0',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
         'Accept-Encoding': 'gzip, deflate',
@@ -91,7 +91,10 @@ def raw():
 # from
 # https://automatetheboringstuff.com/chapter11/
     #res = requests.get('http://google.com/search?q=' + q)
-    res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
+    res = requests.get('https://www.google.com/search?q=' +q+
+                       "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8",
+                       headers=headers_Get
+                      )
     res.raise_for_status()
     return (res.text) # show html page
     
@@ -104,7 +107,11 @@ def search():
     print("q = "+q)
 
     #res = requests.get('http://google.com/search?q=' + q)
-    res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
+    #res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
+    res = requests.get('https://www.google.com/search?q=' +q+
+                       "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8",
+                       headers=headers_Get
+                      )
     res.raise_for_status()
 
 #   print some html reponse information
@@ -123,9 +130,40 @@ def search():
     abstractElems = soup.select('.st') # osearch snippets
     relatedSearches = soup.select('.aw5cc a')
 #    relatedQuestions = soup.select('.st span')
-    for resultStats in soup.find_all("div", "sd"):
-        result_count = resultStats.contents
+#    for resultStats in soup.find_all("div", "sd"):
+#        result_count = resultStats.contents
 #        print("s")
+    print(".resultStats")
+    for i in soup.select("#resultStats"):
+       print("i.text: ")
+       print(i.text)
+       j = i.text.split()
+       print ("["+j[0]+"]")
+       print (j[1])
+       if (j[0] == "About"):
+           #if ( j[1].isnumeric() ):  has commas
+           if ( j[1][0].isdigit() ):
+               result_count = j[1]
+               if ( j[2] == "Million") or (j[2] == "million") :
+                   result_count += ",000,000"
+               elif ( j[2] == "Thousand") or (j[2] == "thousand"):
+                   result_count += ",000"
+               elif ( j[2] == "Results") or (j[2] == "results"):
+                   result_count += ""
+               else: 
+                   result_count = '-1'
+                   assert "Google sent a new resultStats string"
+           else:
+               result_count = '-2'
+       else:
+           result_count = '-3'
+       print("resultStats =", result_count)
+
+       #for m, k in enumerate(j):
+       #    print ("k = ", k)
+       #    print (j[m])
+    print("resultStats2 =", result_count)
+
 
 #    for titleElems in soup.find_all("div", "r"):
     titleElems = soup.select('.r a')
@@ -139,14 +177,19 @@ def search():
         print("link = "+link+"\n")
 
     if (verbose > 3):
-       print("\n\nlinkElems")
-       print(*linkElems, sep = "\n")
+       try:
+          print("\n\nlinkElems")
+          print(*linkElems, sep = "\n")
 
-       print("\n\nabstractElems")
-       print(*abstractElems, sep = "\n")
+          print("\n\nabstractElems")
+          print(*abstractElems, sep = "\n")
 
-       print("\n\nrelatedSearches")
-       print(*relatedSearches, sep = "\n")
+          print("\n\nrelatedSearches")
+          print(*relatedSearches, sep = "\n")
+        except IndexError as e:
+            # just skip it for now
+            print( e)
+            #print sys.exc_type
 
 #    print(*resultStats, sep = "\n")
 #    total_results = int(resultStats[0])
@@ -163,13 +206,16 @@ def search():
 #    return "Searching for "+q
 #    return (res.text) # show html page
 #    return (soup) # show BAD
-    html="<!DOCTYPE doctype html>"
+    html="<!DOCTYPE doctype html><head></head><body>"
 #    for x in range(len(resultStats)):
 #        html=html+"<p>"+str(resultStats[x])+"<br>"
-    for x in range(len(total_results)):
-         html=html+"<p>"+total_results[x]+"<br>"
-         if (verbose > 5):
-             print ("<p>"+total_results[x]+"<br>")
+#   for x in range(len(total_results)):
+#        html=html+"<p>"+total_results[x]+"<br>"
+#        if (verbose > 5):
+#            print ("<p>"+total_results[x]+"<br>")
+    html=html+"<p>"+total_results+"<br>"
+    if (verbose > 5):
+        print ("<p>"+total_results+"<br>")
     html=html+"<h2>Related Searches</h2>"
     for x in range(len(relatedSearches)):
         html=html+str(relatedSearches[x])+"<br><br>"
@@ -185,8 +231,15 @@ def search():
         # can have link without snippet?
         if (verbose > 5):
             print("linkElems="+str(len(linkElems))+" abstractElems="+str(len(abstractElems))+" x="+str(x)+"\n")
-        if ((len(abstractElems)) >= x-1):
+
+        #if ((len(abstractElems)) >= x-1):
+        #if (abstractElems[x]):
+        try :
             html=html+str(abstractElems[x])+"<br><br>"
+        except IndexError as e:
+            # just skip it for now
+            print( e)
+            #print sys.exc_type
 
     # then gen JSON
 
@@ -217,7 +270,9 @@ def json():
     print("q = "+q)
     print('Googling...') # display text while downloading the Google page
     #res = requests.get('http://google.com/search?q=' + q)
-    res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
+    res = requests.get('https://google.com/search?q=' +q+
+                       "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8",
+                      headers=headers_Get)
     res.raise_for_status()
 
 #   print some html reponse information
@@ -237,9 +292,40 @@ def json():
     abstractElems = soup.select('.st') # osearch snippets
     relatedSearches = soup.select('.aw5cc a')
 #    relatedQuestions = soup.select('.st span')
-    for resultStats in soup.find_all("div", "sd"):
-        result_count = resultStats.contents
+#    for resultStats in soup.find_all("div", "sd"):
+#        result_count = resultStats.contents
 #        print("s")
+    print(".resultStats")
+    for i in soup.select("#resultStats"):
+       print("i.text: ")
+       print(i.text)
+       j = i.text.split()
+       print ("["+j[0]+"]")
+       print (j[1])
+       if (j[0] == "About"):
+           #if ( j[1].isnumeric() ):  has commas
+           if ( j[1][0].isdigit() ):
+               result_count = j[1]
+               if ( j[2] == "Million") or (j[2] == "million") :
+                   result_count += ",000,000"
+               elif ( j[2] == "Thousand") or (j[2] == "thousand"):
+                   result_count += ",000"
+               elif ( j[2] == "Results") or (j[2] == "results"):
+                   result_count += ""
+               else: 
+                   result_count = '-1'
+                   assert "Google sent a new resultStats string"
+           else:
+               result_count = '-2'
+       else:
+           result_count = '-3'
+       print("resultStats =", result_count)
+
+       #for m, k in enumerate(j):
+       #    print ("k = ", k)
+       #    print (j[m])
+    print("resultStats2 =", result_count)
+
 
 #    for titleElems in soup.find_all("div", "r"):
     titleElems = soup.select('.r a')
