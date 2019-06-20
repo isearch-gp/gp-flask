@@ -8,6 +8,8 @@ from flask import jsonify
 from flask import request
 import copy
 
+from pprint import pprint
+
 app = Flask(__name__)
 
 # internal switches/from args (default values)
@@ -126,15 +128,20 @@ def search():
 #    print(soup)
 
 # Open a browser tab for each result.
-    linkElems = soup.select('.r a') # osearch links and titles
-    abstractElems = soup.select('.st') # osearch snippets
-    relatedSearches = soup.select('.aw5cc a')
+    #linkElems = soup.select('.r a') # osearch links and titles
+    linkElems = soup.select('div.g div.rc div.r a') # osearch links and titles
+    #abstractElems = soup.select('.st') # osearch snippets
+    abstractElems = soup.select('div.g div.rc div.s div span.st') # osearch snippets
+#    relatedSearches = soup.select('.aw5cc a') changed by google in may 2019
+    relatedSearches = soup.select('p.nVcaUb > a')
+    #pprint(soup.select("p.nVcaUb > a")) # all a tag that inside p
+    
 #    relatedQuestions = soup.select('.st span')
 #    for resultStats in soup.find_all("div", "sd"):
 #        result_count = resultStats.contents
 #        print("s")
     print(".resultStats")
-    for i in soup.select("#resultStats"):
+    for i in soup.select("#resultStats"): # id="resultStats"
        print("i.text: ")
        print(i.text)
        j = i.text.split()
@@ -166,7 +173,7 @@ def search():
 
 
 #    for titleElems in soup.find_all("div", "r"):
-    titleElems = soup.select('.r a')
+    titleElems = soup.select('div.r a')
     for x in range(len(titleElems)):
 #        print(".")
         title = titleElems[x].text
@@ -290,7 +297,8 @@ def json():
 # Open a browser tab for each result.
     linkElems = soup.select('.r a') # osearch links and titles
     abstractElems = soup.select('.st') # osearch snippets
-    relatedSearches = soup.select('.aw5cc a')
+    relatedSearches = soup.select('p.nVcaUb > a')
+    #relatedSearches = soup.select('.aw5cc a')
 #    relatedQuestions = soup.select('.st span')
 #    for resultStats in soup.find_all("div", "sd"):
 #        result_count = resultStats.contents
