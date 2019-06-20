@@ -66,6 +66,11 @@ or with cURL:
 curl http:///127.0.0.1:5000/json?q=malpractice
 ```
 
+## Check indent in py files before checkin
+```
+python -m tabnanny lucky.py
+```
+
 ## Advanced Topics (ToDo)
 
 - CI Testing

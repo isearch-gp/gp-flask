@@ -186,7 +186,7 @@ def search():
 
           print("\n\nrelatedSearches")
           print(*relatedSearches, sep = "\n")
-        except IndexError as e:
+       except IndexError as e:
           # just skip it for now
           print( e)
           #print sys.exc_type
