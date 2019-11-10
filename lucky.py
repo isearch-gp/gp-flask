@@ -38,11 +38,11 @@ except getopt.error as err:
 # evaluate given options
 for currentArgument, currentValue in arguments:  
     if currentArgument in ("-v", "--verbose"):
-        #print ("enabling verbose mode of (%s)", currentValue)
+        # print ("enabling verbose mode of (%s)", currentValue)
         print ("verbose mode of "+str(currentValue))
         verbose = int(currentValue)
     elif currentArgument in ("-h", "--help"):
-        #print ("displaying help")
+        # print ("displaying help")
         print (sys.argv[0]+" - Python Web Scaping API in Flask\n")
         print ("\tOptions:")
         print ("\t-h   --help       this message")
@@ -108,8 +108,8 @@ def search():
     q = request.args.get('q') # not requests
     print("q = "+q)
 
-    #res = requests.get('http://google.com/search?q=' + q)
-    #res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
+    # res = requests.get('http://google.com/search?q=' + q)
+    # res = requests.get('https://google.com/search?q=' +q+ "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8")
     res = requests.get('https://www.google.com/search?q=' +q+
                        "&oq="+q+"&hl=en&gl=us&sourceid=chrome&ie=UTF-8",
                        headers=headers_Get
@@ -128,13 +128,13 @@ def search():
 #    print(soup)
 
 # Open a browser tab for each result.
-    #linkElems = soup.select('.r a') # osearch links and titles
+    # linkElems = soup.select('.r a') # osearch links and titles
     linkElems = soup.select('div.g div.rc div.r a') # osearch links and titles
-    #abstractElems = soup.select('.st') # osearch snippets
+    # abstractElems = soup.select('.st') # osearch snippets
     abstractElems = soup.select('div.g div.rc div.s div span.st') # osearch snippets
 #    relatedSearches = soup.select('.aw5cc a') changed by google in may 2019
     relatedSearches = soup.select('p.nVcaUb > a')
-    #pprint(soup.select("p.nVcaUb > a")) # all a tag that inside p
+    # pprint(soup.select("p.nVcaUb > a")) # all a tag that inside p
     
 #    relatedQuestions = soup.select('.st span')
 #    for resultStats in soup.find_all("div", "sd"):
